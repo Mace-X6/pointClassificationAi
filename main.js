@@ -56,4 +56,5 @@ function testBrain (brain, iterations){
 }
 
 var brain = evolve(10000, 0.1);
+console.log(brain)
 console.log(testBrain(brain, 1000))

@@ -3,9 +3,9 @@ function generatePoints (amount, range){
     var pointArray = [];
     for (var i = 0; i < amount; i++){
         pointArray.push({
-            a : Math.random() * range,
+            y : Math.random() * range,
             x : Math.random() * range,
-            b : Math.random() * range
+            a : Math.random() * range
         })
     }
     return pointArray;
@@ -13,7 +13,7 @@ function generatePoints (amount, range){
 
 // functionObj -> ax + by = 0 -> {a: int, b: int}, standard => a: 1, b: 1 -> y = x
 function classifyPoint (point){ 
-    return point.a * point.x + point.b * point.y <= 0 ? -1 : 1;
+    return point.b - point.y - point.x<= 0 ? -1 : 1;
 }
 
 function birthNewBrain (){

@@ -13,7 +13,7 @@ function generatePoints (amount, range){
 
 // functionObj -> ax + by = 0 -> {a: int, b: int}, standard => a: 1, b: 1 -> y = x
 function classifyPoint (point){ 
-    return point.b - point.y - point.x<= 0 ? -1 : 1;
+    return point.b - point.y + point.x <= 0 ? -1 : 1;
 }
 
 function birthNewBrain (){

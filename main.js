@@ -5,8 +5,7 @@ function generatePoints (amount, range){
         pointArray.push({
             a : Math.random() * range,
             x : Math.random() * range,
-            b : Math.random() * range,
-            y : Math.random() * range
+            b : Math.random() * range
         })
     }
     return pointArray;
@@ -21,14 +20,13 @@ function birthNewBrain (){
     var brain = {
         w1 : Math.random() * 2 - 1,
         w2 : Math.random() * 2 - 1,
-        w3 : Math.random() * 2 - 1,
-        w4 : Math.random() * 2 - 1
+        w3 : Math.random() * 2 - 1
     }
     return brain;
 }
 
 function askAI (brain, point){
-    return point.x * brain.w1 + point.y * brain.w2 <= 0 ? -1 : 1;
+    return point.x * brain.w1 + point.y + brain.w2 <= 0 ? -1 : 1;
 }
 
 function train (brain, point){
@@ -46,7 +44,6 @@ function evolve (generations, learnRate, brain = birthNewBrain()){
             brain.w2 = brain.w2 + points[i].y * error * learnRate;
             brain.w1 = brain.w1 + points[i].x * error * learnRate;
             brain.w3 = brain.w3 + points[i].a * error * learnRate;
-            brain.w4 = brain.w4 + points[i].b * error * learnRate;
         }
         console.clear();
         console.log(`   [${'█'.repeat(Math.floor((i + 1) / generations * loaderSize)) + '_'.repeat(loaderSize - Math.floor((i + 1) / generations * loaderSize))}] ${Math.round(((i + 1) / generations * 10000)) / 100 + '%'}`);
@@ -65,6 +62,6 @@ function testBrain (brain, iterations){
     return Math.round( ( right / iterations ) * 10000 ) / 100 + '%'
 }
 
-var brain = evolve(10**4, 0.01);
+var brain = evolve(10**4, 0.1);
 console.log(brain)
 console.log(testBrain(brain, 10000))

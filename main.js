@@ -16,17 +16,28 @@ function classifyPoint (point){
     return point.b - point.y + point.x <= 0 ? -1 : 1;
 }
 
-function birthNewBrain (){
-    var brain = {
-        w1 : Math.random() * 2 - 1,
-        w2 : Math.random() * 2 - 1,
-        w3 : Math.random() * 2 - 1
+function birthNewBrain (nodeArr){
+    var nodeArr = nodeArr.concat([1]);
+    var brain = {w: [], b: [], accuracy: 0, nodeConfig: nodeArr};
+    for (var i = 0; i < nodeArr.length - 1; i ++){
+        brain.w[i] = [];
+        for (var t = 0; t < nodeArr[i] * nodeArr[i + 1]; t ++){
+            brain.w[i].push(Math.random());
+        }
+    }
+    nodeArr.shift();
+    for (var i = 0; i < nodeArr.length; i ++){
+        brain.b[i] = [];
+        for (var t = 0; t < nodeArr[i]; t ++){
+            brain.b[i].push(Math.random());
+        }
     }
     return brain;
 }
 
 function askAI (brain, point){
-    return point.x * brain.w1 + point.y + brain.w2 <= 0 ? -1 : 1;
+
+    true <= 0 ? -1 : 1;
 }
 
 function train (brain, point){
@@ -34,8 +45,6 @@ function train (brain, point){
 }
 
 function evolve (generations, learnRate, brain = birthNewBrain()){
-    console.clear()
-    var loaderSize = 30;
     var points = generatePoints(generations, 100);
 
     for (var i = 0; i < generations; i++){
@@ -45,8 +54,7 @@ function evolve (generations, learnRate, brain = birthNewBrain()){
             brain.w1 = brain.w1 + points[i].x * error * learnRate;
             brain.w3 = brain.w3 + points[i].a * error * learnRate;
         }
-        console.clear();
-        console.log(`   [${'█'.repeat(Math.floor((i + 1) / generations * loaderSize)) + '_'.repeat(loaderSize - Math.floor((i + 1) / generations * loaderSize))}] ${Math.round(((i + 1) / generations * 10000)) / 100 + '%'}`);
+        // console.log(`   [${'█'.repeat(Math.floor((i + 1) / generations * loaderSize)) + '_'.repeat(loaderSize - Math.floor((i + 1) / generations * loaderSize))}] ${Math.round(((i + 1) / generations * 10000)) / 100 + '%'}`);
     }
     return brain;
 }
@@ -62,6 +70,4 @@ function testBrain (brain, iterations){
     return Math.round( ( right / iterations ) * 10000 ) / 100 + '%'
 }
 
-var brain = evolve(10**4, 0.1);
-console.log(brain)
-console.log(testBrain(brain, 10000))
+console.log(birthNewBrain([4,2,2]))

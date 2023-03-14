@@ -48,9 +48,10 @@ function askAI(brain, point) {
         if (i > 0) {
             for (var t = 0; t < brain.nodeConfig[i]; t++) {
                 var tempNodeVal = 0;
-                for (var o = 0; o < tempArr[i - 1].length; o++) {
+                for (var o = 0; o < (tempArr[i - 1].length === 1 ? tempArr[i - 1].length + 1 : tempArr[i - 1].length); o++) {
                     tempNodeVal += tempArr[i - 1][o] * brain.w[i - 1][o + t];
                 }
+                tempNodeVal += brain.b[i - 1][t];
                 tempArr[i].push(tempNodeVal);
             }
         }
@@ -87,10 +88,10 @@ function testBrain(brain, iterations) {
     }
     return Math.round((right / iterations) * 10000) / 100 + '%'
 }
-
-console.log(askAI(birthNewBrain([3, 2, 2]), {
+var brain = birthNewBrain([3, 2, 2)
+console.log(askAI(brain, {
     x: 1,
     y: 1,
     a: 1
 }))
-console.log(birthNewBrain([3, 2, 2, 2]))
+console.log(brain)

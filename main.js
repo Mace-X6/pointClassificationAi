@@ -11,9 +11,8 @@ function generatePoints(amount, range) {
     return pointArray;
 }
 
-// functionObj -> ax + by = 0 -> {a: int, b: int}, standard => a: 1, b: 1 -> y = x
 function classifyPoint(point) {
-    return point.b - point.y + point.x <= 0 ? -1 : 1;
+    return point.a * point.x <= point.y ? 1 : -1;
 }
 
 function birthNewBrain(nodeArr) {
@@ -27,71 +26,92 @@ function birthNewBrain(nodeArr) {
     for (var i = 0; i < nodeArr.length - 1; i++) {
         brain.w[i] = [];
         for (var t = 0; t < nodeArr[i] * nodeArr[i + 1]; t++) {
-            brain.w[i].push(1);
+            brain.w[i].push(Math.random() * 2 - 1);
         }
     }
     nodeArr.shift();
     for (var i = 0; i < nodeArr.length; i++) {
         brain.b[i] = [];
         for (var t = 0; t < nodeArr[i]; t++) {
-            brain.b[i].push(1);
+            brain.b[i].push(Math.random() * 2 - 1);
         }
     }
     return brain;
 }
 
-function askAI(brain, point) {
-    var input = [point.a, point.x, point.y];
+function askAI(brain, input) {
+    var inputNodes = [input.a, input.x, input.y];
     var tempArr = [];
     for (var i = 0; i < brain.nodeConfig.length; i++) {
-        i === 0 ? tempArr[0] = input : tempArr[i] = [];
+        i === 0 ? tempArr[0] = inputNodes : tempArr[i] = [];
         if (i > 0) {
             for (var t = 0; t < brain.nodeConfig[i]; t++) {
                 var tempNodeVal = 0;
                 for (var o = 0; o < (tempArr[i - 1].length === 1 ? tempArr[i - 1].length + 1 : tempArr[i - 1].length); o++) {
                     tempNodeVal += tempArr[i - 1][o] * brain.w[i - 1][o + t];
                 }
-                tempNodeVal += brain.b[i - 1][t];
+                tempNodeVal += brain.b[i-1][t];
                 tempArr[i].push(tempNodeVal);
             }
         }
     }
-    return tempArr[tempArr.length - 1];
+    return tempArr[tempArr.length - 1] >= 0 ? -1 : 1;
 }
 
-function train(brain, point) {
-    return error = -(askAI(brain, point) - classifyPoint(point)) / 2;
+function calcError(brain, point) {
+    return  (askAI(brain, point) - classifyPoint(point)) / 2;
 }
 
-function evolve(generations, learnRate, brain = birthNewBrain()) {
-    var points = generatePoints(generations, 100);
+function train(generations, learnRate, brain = birthNewBrain([3])) {
+    var points = generatePoints(generations, 1000);
 
     for (var i = 0; i < generations; i++) {
-        var error = train(brain, points[i])
+        var error = calcError(brain, points[i])
+        var point = [points[i].x, points[i].y, points[i].a];
         if (error != 0) {
-            brain.w2 = brain.w2 + points[i].y * error * learnRate;
-            brain.w1 = brain.w1 + points[i].x * error * learnRate;
-            brain.w3 = brain.w3 + points[i].a * error * learnRate;
+            for (var u = 0; u < brain.w.length; u++) {
+                for (var t = 0; t < brain.w[u].length; t++) {
+                    brain.w[u][t] = brain.w[u][t] + point[t] * /*(u % 2 === 0 ? error : -error)*/ error * learnRate;
+                }
+            }
+                for (var u = 0; u < brain.b.length; u++) {
+                    for (var t = 0; t < brain.b[u].length; t++) {
+                        brain.b[u][t] = brain.b[u][t] + point[t] * error * learnRate;
+                    }
+                }
+            // console.log(`   [${'█'.repeat(Math.floor((i + 1) / generations * loaderSize)) + '_'.repeat(loaderSize - Math.floor((i + 1) / generations * loaderSize))}] ${Math.round(((i + 1) / generations * 10000)) / 100 + '%'}`);
         }
-        // console.log(`   [${'█'.repeat(Math.floor((i + 1) / generations * loaderSize)) + '_'.repeat(loaderSize - Math.floor((i + 1) / generations * loaderSize))}] ${Math.round(((i + 1) / generations * 10000)) / 100 + '%'}`);
     }
     return brain;
 }
 
-function testBrain(brain, iterations) {
+function testBrain(brain, iterations, returnStr = false) {
     var right = 0;
-    var pointArr = generatePoints(iterations, 100)
+    var pointArr = generatePoints(iterations, 1000)
     for (var i = 0; i < iterations; i++) {
         if (askAI(brain, pointArr[i]) === classifyPoint(pointArr[i])) {
             right++;
         }
     }
-    return Math.round((right / iterations) * 10000) / 100 + '%'
+    if (returnStr){
+        return `${Math.round((right / iterations) * 10000) / 100}% ( ${right} correct out of ${iterations} iterations ) `;
+    }
+    else{
+        return Math.round((right / iterations) * 10000) / 100;
+    }
 }
-var brain = birthNewBrain([3, 2, 2)
-console.log(askAI(brain, {
-    x: 1,
-    y: 1,
-    a: 1
-}))
+var brain = birthNewBrain([3]);
+for (var i = 0; i < 25; i ++){
+    if (brain.accuracy === 100){
+        i = 25
+    }
+    var tempBrain = train(10**6, 0.001, brain);
+    tempBrain.accuracy = testBrain(tempBrain, 10**4);
+    console.log(tempBrain)
+    console.log(brain)
+    if (tempBrain.accuracy > brain.accuracy){
+        brain = tempBrain;
+    }
+    console.log(brain.accuracy)
+}
 console.log(brain)

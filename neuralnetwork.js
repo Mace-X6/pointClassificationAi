@@ -1,9 +1,9 @@
-class neuralNetwork {
+class NeuralNetwork {
 
-    constructor(model, nodeConfig, calcError /* must take model & input - must output -1 / 1 / 0 */, testModelAccuracy /* must take model & testgenerations, must return 0 <= float <= 1 */, generateTrainingData /* must take amount of expected outcomes, must return array with array of data */) {
-        this.calcError = calcError;
+    constructor(model, nodeConfig,
+    testModelAccuracy, // must take model & testgenerations, must return 0 <= float <= 1 
+    ) {
         this.testModelAccuracy = testModelAccuracy;
-        this.generateTrainingData = generateTrainingData;
 
         if (nodeConfig) {
             var model = {
@@ -51,35 +51,12 @@ class neuralNetwork {
         return tempArr[tempArr.length - 1];
     }
 
-    train(learnRate, generations) {
-        var model = Object.assign({}, this.model);
-        var trainingDataArray = this.generateTrainingData(generations)
-        for (var i = 0; i < generations; i++) {
-            var trainingData = trainingDataArray[i];
-            var error = this.calcError(model, trainingDataArray[i])
-            if (error != 0) {
-                for (var u = 0; u < model.w.length; u++) {
-                    for (var t = 0; t < model.w[u].length; t++) {
-                        model.w[u][t] += trainingData[t % trainingData.length] * (u % 2 === 0 ? -error : error) * learnRate;
-                    }
-                }
-                for (var u = 0; u < model.b.length; u++) {
-                    for (var t = 0; t < model.b[u].length; t++) {
-                        model.b[u][t] += trainingData[t % trainingData.length] * error * learnRate;
-                    }
-                }
-                // console.log(`   [${'█'.repeat(Math.floor((i + 1) / generations * loaderSize)) + '_'.repeat(loaderSize - Math.floor((i + 1) / generations * loaderSize))}] ${Math.round(((i + 1) / generations * 10000)) / 100 + '%'}`);
-            }
-        }
-        model.accuracy = this.testModelAccuracy(model, generations);
-        if (this.model.accuracy <= model.accuracy){
-            this.model = Object.assign({}, model)
-        }
-        return this.model;
-    }
-
     resetAccuracy(decimalPlaces){
         this.model.accuracy = this.testModelAccuracy(this.model, 10 ** decimalPlaces)
     }
+
+    setModel(model){
+        this.model = model;
+    }
 }
-module.exports = neuralNetwork;
+module.exports = NeuralNetwork;

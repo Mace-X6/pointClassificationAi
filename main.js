@@ -1,4 +1,5 @@
-const neuralNetwork = require('./neuralnetwork.js');
+const NeuralNetwork = require('./neuralnetwork.js');
+const TrainNeuralNetwork = require('./trainneuralnetwork.js');
 
 // the plot will be a square with sides of length range
 function generatePoints(amount) {
@@ -29,7 +30,7 @@ function testModel(model, iterations, returnType = 'num') {
             return right / iterations;
 }
 
-var NeuralNetwork = new neuralNetwork(null, [3, 6, 6, 3, 1], calcError, testModel, generatePoints);
+var neuralNetwork = new NeuralNetwork(null, [3, 6, 6, 3, 1], calcError, testModel, generatePoints);
 
 const fs = require('fs');
 // var model = JSON.parse(fs.readFileSync('brain.json'))
@@ -37,16 +38,16 @@ const fs = require('fs');
 // console.log(testModel(model, 10 ** 4, 'frac'))
 var precision = 4;
 for (var i = 0; i < 100; i++) {
-    console.log('NeuralNetwork.model')
-    console.log(NeuralNetwork.model)
-    NeuralNetwork.train(0.001, 10 ** precision);
-    if (NeuralNetwork.model.accuracy === 1 && precision < 7){
+    console.log('neuralNetwork.model')
+    console.log(neuralNetwork.model)
+    neuralNetwork.setModel(TrainNeuralNetwork(0.001, generatePoints(10**precision), calcError, testModel, neuralNetwork.model));
+    if (neuralNetwork.model.accuracy === 1 && precision < 7){
         precision ++;
-        NeuralNetwork.resetAccuracy(precision)
+        neuralNetwork.resetAccuracy(precision);
     }
     if (precision >= 7){
         i = 100;
     }
 }
-console.log(NeuralNetwork.model)
-fs.writeFileSync('brain.json', JSON.stringify(NeuralNetwork.model));
+console.log(neuralNetwork.model)
+fs.writeFileSync('brain.json', JSON.stringify(neuralNetwork.model));
